@@ -7,9 +7,14 @@ use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return Product::all();
+        //return Product::all();
+        //return Product::paginate(10);
+        $sortField = $request->query('sort', 'id');
+        $sortDirection = $request->query('direction', 'asc');
+    
+        return Product::orderBy($sortField, $sortDirection)->paginate(10);
     }
 
     // Crear un nuevo producto
@@ -29,7 +34,14 @@ class ProductController extends Controller
     // Mostrar un producto específico
     public function show($id)
     {
-        return Product::findOrFail($id);
+     // Obtener el producto
+     $product = Product::findOrFail($id);
+
+     // producto con el precio incluyendo IVA
+     return response()->json([
+         'product' => $product,
+         'price_with_vat' => $product->price_with_vat,
+     ]);
     }
 
     // Actualizar un producto
@@ -46,4 +58,5 @@ class ProductController extends Controller
         Product::destroy($id);
         return response()->json(null, 204);
     }
+    
 }
