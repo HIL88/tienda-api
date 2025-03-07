@@ -14,7 +14,16 @@ class ProductController extends Controller
         $sortField = $request->query('sort', 'id');
         $sortDirection = $request->query('direction', 'asc');
     
-        return Product::orderBy($sortField, $sortDirection)->paginate(10);
+        // Obtener los productos paginados
+    $products = Product::orderBy($sortField, $sortDirection)->paginate(10);
+
+    // Agregar el precio con IVA a cada producto
+    $products->getCollection()->transform(function ($product) {
+        $product->price_with_vat = $product->price_with_vat;
+        return $product;
+    });
+
+    return $products;
     }
 
     // Crear un nuevo producto
@@ -28,7 +37,11 @@ class ProductController extends Controller
         ]);
 
         $product = Product::create($request->all());
-        return response()->json($product, 201);
+        // Incluir el precio con IVA en la respuesta
+    return response()->json([
+        'product' => $product,
+        'price_with_vat' => $product->price_with_vat,
+    ], 201);
     }
 
     // Mostrar un producto específico
@@ -49,7 +62,12 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($id);
         $product->update($request->all());
-        return response()->json($product);
+
+        // Incluir el precio con IVA en la respuesta
+    return response()->json([
+        'product' => $product,
+        'price_with_vat' => $product->price_with_vat,
+    ]);
     }
 
     // Eliminar un producto

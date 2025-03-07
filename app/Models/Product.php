@@ -19,8 +19,9 @@ class Product extends Model
 
     public function getPriceWithVatAttribute()
     {
-        $ivaRate = 0.12; 
-        return $this->price * (1 + $ivaRate);
+        $vatRate = 0.12; // IVA 
+        $priceWithVat = $this->price * (1 + $vatRate);
+        return round($priceWithVat, 2); 
     }
 
 }
