@@ -14,12 +14,14 @@ class ProductController extends Controller
         $sortField = $request->query('sort', 'id');
         $sortDirection = $request->query('direction', 'asc');
     
-        // Obtener los productos paginados
-    $products = Product::orderBy($sortField, $sortDirection)->paginate(10);
+        $perPage = $request->query('per_page', 10); 
 
-    // Agregar el precio con IVA a cada producto
-    $products->getCollection()->transform(function ($product) {
-        $product->price_with_vat = $product->price_with_vat;
+        // Obtener los productos paginados
+        $products = Product::orderBy($sortField, $sortDirection)->paginate($perPage);
+
+        // Agregar el precio con IVA a cada producto
+        $products->getCollection()->transform(function ($product) {
+            $product->price_with_vat = $product->price_with_vat;
         return $product;
     });
 
